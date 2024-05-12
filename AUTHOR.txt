@@ -1,0 +1,15 @@
+#    SPDX-FileCopyrightText: 2024 AlvaroJoseLopes and osnibrito
+#   
+#    SPDX-License-Identifier: CC-BY-ND-4.0
+
+ AUTHORS
+ ------------------------------
+
+ AlvaroJoseLopes <alvarojoselopes@usp.br>
+ osnibrito <brito56@usp.br>
+
+ Attribution
+ ------------------------------
+ This project is a programming exercise based on SYSeg learning material.
+ SYSeg is accessible at: https://gitlab.com/monaco/syseg-template.
+
