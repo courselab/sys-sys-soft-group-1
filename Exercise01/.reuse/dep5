@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Exercise01
+Upstream-Contact: AlvaroJoseLopes <alvarojoselopes@hotmail.com>
+Source: https://gitlab.com/monaco/syseg.git
+
+Files: */.dist
+Copyright: AlvaroJoseLopes <alvarojoselopes@hotmail.com>
+License: CC0-1.0
+
