@@ -1,0 +1,169 @@
+#    SPDX-FileCopyrightText: 2024 AlvaroJoseLopes <alvarojoselopes@hotmail.com>
+#   
+#    SPDX-License-Identifier: GPL-3.0-or-later
+
+# Bypassing
+
+Para fazer o bypass do programa os seguintes passos foram feitos:
+
+## Decompiling do código
+
+Utilizamos a ferramenta online [dogbolt](https://dogbolt.org/) para fazer engenharia reversa do código `decode`. A função main executa as seguintes intruções:
+
+```c
+int32_t main(int32_t argc, char** argv, char** envp)
+{
+    void* const __return_addr_1 = __return_addr;
+    int32_t* var_10 = &argc;
+    void* gsbase;
+    int32_t eax_1 = *(gsbase + 0x14);
+    hashcheck();
+    if (argc <= 1)
+    {
+        printf("Usage: %s <file-name>\n", __xpg_basename(*argv));
+        exit(1);
+        /* no return */
+    }
+    char* filename = argv[1];
+    printf("Access token: ");
+    void var_214;
+    __isoc99_scanf(&data_804a02e, &var_214);
+    obf(&var_214, &_key, 1);
+    int32_t var_220 = 0;
+    while (&token[var_220] != 0)
+    {
+        if (strcmp(&token[var_220], &var_214) == 0)
+        {
+            break;
+        }
+        var_220 = (var_220 + 1);
+    }
+    int32_t eax_14;
+    if (&token[var_220] == 0)
+    {
+        puts("Denied.");
+        eax_14 = 1;
+    }
+    else
+    {
+        FILE* fp = fopen(filename, &data_804a039);
+        if (fp == 0)
+        {
+            char* filename_1;
+            if (filename == 0)
+            {
+                filename_1 = &data_804a03b;
+            }
+            else
+            {
+                filename_1 = filename;
+            }
+            fprintf(__TMC_END__, "%s (%s)\n", strerror(*__errno_location()), filename_1);
+            exit(1);
+            /* no return */
+        }
+        while (true)
+        {
+            void buf;
+            if (fgets(&buf, 0x100, fp) == 0)
+            {
+                break;
+            }
+            obf(&buf, &_key, 0xff);
+            printf(&data_804a02e, &buf);
+        }
+        putchar(0xa);
+        eax_14 = 0;
+    }
+    *(gsbase + 0x14);
+    if (eax_1 == *(gsbase + 0x14))
+    {
+        return eax_14;
+    }
+    __stack_chk_fail();
+    /* no return */
+}
+```
+
+Pode-se notar que o bloco de código da branch else do `if (&token[var_220] == 0)` realiza a descriptografia do conteúdo.
+
+Por meio do comando `objdump -d decode` podemos identificar o endereço da instrução que executa o if e podemos alterar o valor da variável para executar o `else`.
+
+```
+ 804937c:       e8 bf fc ff ff          call   8049040 <strcmp@plt>
+ 8049381:       83 c4 10                add    $0x10,%esp
+ 8049384:       85 c0                   test   %eax,%eax
+ 8049386:       75 c4                   jne    804934c <main+0xbf>
+ 8049388:       8b 85 e8 fd ff ff       mov    -0x218(%ebp),%eax
+ 804938e:       8b 04 85 18 c0 04 08    mov    0x804c018(,%eax,4),%eax
+ 8049395:       85 c0                   test   %eax,%eax -> Estamos interessados nessa intrução
+ 8049397:       75 1a                   jne    80493b3 <main+0x126>
+ 8049399:       83 ec 0c                sub    $0xc,%esp
+ 804939c:       68 31 a0 04 08          push   $0x804a031
+ 80493a1:       e8 0a fd ff ff          call   80490b0 <puts@plt>
+ 80493a6:       83 c4 10                add    $0x10,%esp
+ 80493a9:       b8 01 00 00 00          mov    $0x1,%eax
+ 80493ae:       e9 d1 00 00 00          jmp    8049484 <main+0x1f7>
+```
+
+## Usando GDB para executar o bloco de código alvo
+
+Para executar a branch `else`, podemos usar o GDB e seguir os seguintes passos:
+- Inserir um breakpoint nesse endereço
+- Colocar o valor do registrador como 0, para executar o `else`
+
+Basta executar os seguintes comandos no gdb:
+```gdb
+(gdb) file decode
+Reading symbols from decode...
+(No debugging symbols found in decode)
+(gdb) set environment FD_LIBRARY_PATH ./
+(gdb) b *0x8049395
+Breakpoint 1 at 0x8049395
+(gdb) run secret.cry
+Starting program: /home/alvaro/Faculdade/sys-sys-soft-group-1/imf/decode secret.cry
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[Detaching after vfork from child process 6398]
+Access token: senha_forte
+
+Breakpoint 1, 0x08049395 in main ()
+(gdb) info registers
+eax            0x0                 0
+ecx            0xc8                200
+edx            0xf7fbe00a          -134488054
+ebx            0xffffcc60          -13216
+esp            0xffffca20          0xffffca20
+ebp            0xffffcc48          0xffffcc48
+esi            0xffffcd20          -13024
+edi            0xf7ffcb60          -134231200
+eip            0x8049395           0x8049395 <main+264>
+eflags         0x246               [ PF ZF IF ]
+cs             0x23                35
+ss             0x2b                43
+--Type <RET> for more, q to quit, c to continue without paging--
+ds             0x2b                43
+es             0x2b                43
+fs             0x0                 0
+gs             0x63                99
+(gdb) set $eax=0x1
+(gdb) c
+Continuing.
+https://drive.google.com/file/d/1n0w8dFS8zJ7flnAQI75uLkw40IzAVUdW
+[Inferior 1 (process 6395) exited normally
+```
+
+O conteúdo descriptogrado é:
+https://drive.google.com/file/d/1n0w8dFS8zJ7flnAQI75uLkw40IzAVUdW
+
+# Solução final 
+
+Para a solução final adicionamos um script gdb que executa os comandos demonstrados.
+
+Para executá-lo basta rodar:
+```
+make bypass
+```
+
+> Nota: Quando o access token for solicitado, insira qualquer valor
+
