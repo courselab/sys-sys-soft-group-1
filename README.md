@@ -6,6 +6,7 @@
 #  and contains modifications carried out by the following author(s):
 #  AlvaroJoseLopes <alvarojoselopes@usp.br> NUSP: 10873365
 #  osnibrito <brito56@usp.br> NUSP: 11857330
+#  Vitor da silveira Paula <vitor.silveira98@usp.br> NUSP: 10689651
 
  This is free software distributed under the terms of the GNU General Public 
  License version 3 of the license or, at your discretion, any later version. 
