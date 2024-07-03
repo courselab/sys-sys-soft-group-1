@@ -1,0 +1,206 @@
+make d IMG=p3  
+make[1]: Entering directory '/home/alvaro/Faculdade/sys-sys-soft-group-1/quiz'
+
+p3:     file format elf32-i386
+
+
+Disassembly of section .init:
+
+08049000 <_init>:
+ 8049000:	53                   	push   %ebx
+ 8049001:	83 ec 08             	sub    $0x8,%esp
+ 8049004:	e8 77 00 00 00       	call   8049080 <__x86.get_pc_thunk.bx>
+ 8049009:	81 c3 d3 2f 00 00    	add    $0x2fd3,%ebx
+ 804900f:	8b 83 18 00 00 00    	mov    0x18(%ebx),%eax
+ 8049015:	85 c0                	test   %eax,%eax
+ 8049017:	74 02                	je     804901b <_init+0x1b>
+ 8049019:	ff d0                	call   *%eax
+ 804901b:	83 c4 08             	add    $0x8,%esp
+ 804901e:	5b                   	pop    %ebx
+ 804901f:	c3                   	ret
+
+Disassembly of section .plt:
+
+08049020 <__libc_start_main@plt-0x10>:
+ 8049020:	ff 35 e0 bf 04 08    	push   0x804bfe0
+ 8049026:	ff 25 e4 bf 04 08    	jmp    *0x804bfe4
+ 804902c:	00 00                	add    %al,(%eax)
+	...
+
+08049030 <__libc_start_main@plt>:
+ 8049030:	ff 25 e8 bf 04 08    	jmp    *0x804bfe8
+ 8049036:	68 00 00 00 00       	push   $0x0
+ 804903b:	e9 e0 ff ff ff       	jmp    8049020 <_init+0x20>
+
+Disassembly of section .plt.got:
+
+08049040 <__cxa_finalize@plt>:
+ 8049040:	ff 25 f0 bf 04 08    	jmp    *0x804bff0
+ 8049046:	66 90                	xchg   %ax,%ax
+
+Disassembly of section .text:
+
+08049050 <_start>:
+ 8049050:	31 ed                	xor    %ebp,%ebp
+ 8049052:	5e                   	pop    %esi
+ 8049053:	89 e1                	mov    %esp,%ecx
+ 8049055:	83 e4 f0             	and    $0xfffffff0,%esp
+ 8049058:	50                   	push   %eax
+ 8049059:	54                   	push   %esp
+ 804905a:	52                   	push   %edx
+ 804905b:	e8 18 00 00 00       	call   8049078 <_start+0x28>
+ 8049060:	81 c3 7c 2f 00 00    	add    $0x2f7c,%ebx
+ 8049066:	6a 00                	push   $0x0
+ 8049068:	6a 00                	push   $0x0
+ 804906a:	51                   	push   %ecx
+ 804906b:	56                   	push   %esi
+ 804906c:	ff b3 1c 00 00 00    	push   0x1c(%ebx)
+ 8049072:	e8 b9 ff ff ff       	call   8049030 <__libc_start_main@plt>
+ 8049077:	f4                   	hlt
+ 8049078:	8b 1c 24             	mov    (%esp),%ebx
+ 804907b:	c3                   	ret
+ 804907c:	66 90                	xchg   %ax,%ax
+ 804907e:	66 90                	xchg   %ax,%ax
+
+08049080 <__x86.get_pc_thunk.bx>:
+ 8049080:	8b 1c 24             	mov    (%esp),%ebx
+ 8049083:	c3                   	ret
+ 8049084:	66 90                	xchg   %ax,%ax
+ 8049086:	66 90                	xchg   %ax,%ax
+ 8049088:	66 90                	xchg   %ax,%ax
+ 804908a:	66 90                	xchg   %ax,%ax
+ 804908c:	66 90                	xchg   %ax,%ax
+ 804908e:	66 90                	xchg   %ax,%ax
+
+08049090 <deregister_tm_clones>:
+ 8049090:	e8 e4 00 00 00       	call   8049179 <__x86.get_pc_thunk.dx>
+ 8049095:	81 c2 47 2f 00 00    	add    $0x2f47,%edx
+ 804909b:	8d 8a 2c 00 00 00    	lea    0x2c(%edx),%ecx
+ 80490a1:	8d 82 2c 00 00 00    	lea    0x2c(%edx),%eax
+ 80490a7:	39 c8                	cmp    %ecx,%eax
+ 80490a9:	74 1d                	je     80490c8 <deregister_tm_clones+0x38>
+ 80490ab:	8b 82 10 00 00 00    	mov    0x10(%edx),%eax
+ 80490b1:	85 c0                	test   %eax,%eax
+ 80490b3:	74 13                	je     80490c8 <deregister_tm_clones+0x38>
+ 80490b5:	55                   	push   %ebp
+ 80490b6:	89 e5                	mov    %esp,%ebp
+ 80490b8:	83 ec 14             	sub    $0x14,%esp
+ 80490bb:	51                   	push   %ecx
+ 80490bc:	ff d0                	call   *%eax
+ 80490be:	83 c4 10             	add    $0x10,%esp
+ 80490c1:	c9                   	leave
+ 80490c2:	c3                   	ret
+ 80490c3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+ 80490c8:	c3                   	ret
+ 80490c9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+
+080490d0 <register_tm_clones>:
+ 80490d0:	e8 a4 00 00 00       	call   8049179 <__x86.get_pc_thunk.dx>
+ 80490d5:	81 c2 07 2f 00 00    	add    $0x2f07,%edx
+ 80490db:	55                   	push   %ebp
+ 80490dc:	89 e5                	mov    %esp,%ebp
+ 80490de:	53                   	push   %ebx
+ 80490df:	8d 8a 2c 00 00 00    	lea    0x2c(%edx),%ecx
+ 80490e5:	8d 82 2c 00 00 00    	lea    0x2c(%edx),%eax
+ 80490eb:	83 ec 04             	sub    $0x4,%esp
+ 80490ee:	29 c8                	sub    %ecx,%eax
+ 80490f0:	89 c3                	mov    %eax,%ebx
+ 80490f2:	c1 e8 1f             	shr    $0x1f,%eax
+ 80490f5:	c1 fb 02             	sar    $0x2,%ebx
+ 80490f8:	01 d8                	add    %ebx,%eax
+ 80490fa:	d1 f8                	sar    $1,%eax
+ 80490fc:	74 14                	je     8049112 <register_tm_clones+0x42>
+ 80490fe:	8b 92 20 00 00 00    	mov    0x20(%edx),%edx
+ 8049104:	85 d2                	test   %edx,%edx
+ 8049106:	74 0a                	je     8049112 <register_tm_clones+0x42>
+ 8049108:	83 ec 08             	sub    $0x8,%esp
+ 804910b:	50                   	push   %eax
+ 804910c:	51                   	push   %ecx
+ 804910d:	ff d2                	call   *%edx
+ 804910f:	83 c4 10             	add    $0x10,%esp
+ 8049112:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+ 8049115:	c9                   	leave
+ 8049116:	c3                   	ret
+ 8049117:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+ 804911e:	00 
+ 804911f:	90                   	nop
+
+08049120 <__do_global_dtors_aux>:
+ 8049120:	f3 0f 1e fb          	endbr32
+ 8049124:	55                   	push   %ebp
+ 8049125:	89 e5                	mov    %esp,%ebp
+ 8049127:	53                   	push   %ebx
+ 8049128:	e8 53 ff ff ff       	call   8049080 <__x86.get_pc_thunk.bx>
+ 804912d:	81 c3 af 2e 00 00    	add    $0x2eaf,%ebx
+ 8049133:	83 ec 04             	sub    $0x4,%esp
+ 8049136:	80 bb 2c 00 00 00 00 	cmpb   $0x0,0x2c(%ebx)
+ 804913d:	75 27                	jne    8049166 <__do_global_dtors_aux+0x46>
+ 804913f:	8b 83 14 00 00 00    	mov    0x14(%ebx),%eax
+ 8049145:	85 c0                	test   %eax,%eax
+ 8049147:	74 11                	je     804915a <__do_global_dtors_aux+0x3a>
+ 8049149:	83 ec 0c             	sub    $0xc,%esp
+ 804914c:	ff b3 28 00 00 00    	push   0x28(%ebx)
+ 8049152:	e8 e9 fe ff ff       	call   8049040 <__cxa_finalize@plt>
+ 8049157:	83 c4 10             	add    $0x10,%esp
+ 804915a:	e8 31 ff ff ff       	call   8049090 <deregister_tm_clones>
+ 804915f:	c6 83 2c 00 00 00 01 	movb   $0x1,0x2c(%ebx)
+ 8049166:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+ 8049169:	c9                   	leave
+ 804916a:	c3                   	ret
+ 804916b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+
+08049170 <frame_dummy>:
+ 8049170:	f3 0f 1e fb          	endbr32
+ 8049174:	e9 57 ff ff ff       	jmp    80490d0 <register_tm_clones>
+
+08049179 <__x86.get_pc_thunk.dx>:
+ 8049179:	8b 14 24             	mov    (%esp),%edx
+ 804917c:	c3                   	ret
+
+0804917d <main>:
+ 804917d:	55                   	push   %ebp
+ 804917e:	89 e5                	mov    %esp,%ebp
+ 8049180:	83 e4 f0             	and    $0xfffffff0,%esp
+ 8049183:	e8 07 00 00 00       	call   804918f <foo>
+ 8049188:	b8 00 00 00 00       	mov    $0x0,%eax
+ 804918d:	c9                   	leave
+ 804918e:	c3                   	ret
+
+0804918f <foo>:
+ 804918f:	55                   	push   %ebp
+ 8049190:	89 e5                	mov    %esp,%ebp
+ 8049192:	83 ec 18             	sub    $0x18,%esp
+ 8049195:	8b 45 08             	mov    0x8(%ebp),%eax
+ 8049198:	83 c0 01             	add    $0x1,%eax
+ 804919b:	83 ec 0c             	sub    $0xc,%esp
+ 804919e:	50                   	push   %eax
+ 804919f:	e8 0e 00 00 00       	call   80491b2 <bar>
+ 80491a4:	83 c4 10             	add    $0x10,%esp
+ 80491a7:	0f be c0             	movsbl %al,%eax
+ 80491aa:	89 45 f4             	mov    %eax,-0xc(%ebp)
+ 80491ad:	8b 45 f4             	mov    -0xc(%ebp),%eax
+ 80491b0:	c9                   	leave
+ 80491b1:	c3                   	ret
+
+080491b2 <bar>:
+ 80491b2:	55                   	push   %ebp
+ 80491b3:	89 e5                	mov    %esp,%ebp
+ 80491b5:	83 ec 10             	sub    $0x10,%esp
+ 80491b8:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80491bb:	83 c0 01             	add    $0x1,%eax
+ 80491be:	89 45 fc             	mov    %eax,-0x4(%ebp)
+ 80491c1:	8b 45 fc             	mov    -0x4(%ebp),%eax
+ 80491c4:	c9                   	leave
+ 80491c5:	c3                   	ret
+
+Disassembly of section .fini:
+
+080491c8 <_fini>:
+ 80491c8:	53                   	push   %ebx
+ 80491c9:	83 ec 08             	sub    $0x8,%esp
+ 80491cc:	e8 af fe ff ff       	call   8049080 <__x86.get_pc_thunk.bx>
+ 80491d1:	81 c3 0b 2e 00 00    	add    $0x2e0b,%ebx
+ 80491d7:	83 c4 08             	add    $0x8,%esp
+ 80491da:	5b                   	pop    %ebx
+ 80491db:	c3                   	ret
+make[1]: Leaving directory '/home/alvaro/Faculdade/sys-sys-soft-group-1/quiz'

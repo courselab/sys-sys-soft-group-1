@@ -1,0 +1,275 @@
+#    SPDX-FileCopyrightText: 2024 AlvaroJoseLopes <alvarojoselopes@hotmail.com>
+#   
+#    SPDX-License-Identifier: GPL-3.0-or-later
+
+# Exercicio 1
+O programa p1.c imprime na tela o endereço da função main, cada saida é diferente mas possui algumas semelhanças (3 primeiros e 3 ultimos caracteres) pois os endereços observados compartilham prefixos comuns devido à localização no mesmo segmento de memória (Text Segment), randomizado pelo ASLR. O sufixo comum é resultado do alinhamento consistente das funções dentro desse segmento, determinado pelo compilador. Esses padrões são uma consequência da combinação do layout de memória do programa e das técnicas de segurança e otimização empregadas pelo sistema operacional e compilador.
+
+Exemplos de saida:
+```
+0x55e53971c149
+0x55a63f83f149
+0x559d4654c149
+0x558a88056149
+0x558b6904e149
+0x556044eb3149
+0x55b5f9063149
+0x562d0255a149
+0x561afc82d149
+```
+
+# Exercício 2
+
+Ao rodar o arquivo e fornecer "foo" como entrada, estamos dentro do fluxo esperado em que o usuário fornece a senha correta.
+
+Por outro lado, ao fornecer "youshallnotpass" como password, temos o acesso garantido por conta de uma falha de design do sistema que permite buffer overflow. 
+Essa falha ocorre porque não há nenhum tipo de checagem da quantidade de caracteres fornecido pelo usuário, podendo exceder o tamanho de 10 caracteres. O buffer overflow faz com que a variável `verified` seja diferente de zero, passando pela checagem do `if`.   
+
+Uma possível solução seria utilizar a função `fgets` uma vez que ela **"Reads at most count - 1 characters from the given file stream and stores them in the character array"**, evitando o cenário de buffer overflow.
+
+A leitura da senha poderia ser feita da seguinte forma:
+```c
+char user_key[10];
+// .....
+printf("Enter password: ");
+if (fgets(user_key, sizeof(user_key), stdin) != NULL)
+{
+    size_t len = strlen(user_key);
+    if (len > 0 && user_key[len-1] == '\n') {
+        user_key[len-1] = '\0';  // Remove newline character
+    }
+}
+```
+
+A solução completa pode ser testada rodando os seguintes comandos:
+```bash
+make p2_solution
+./p2_solution
+```
+
+Após compilar com a flag `-fstack-protector` o programa fica protegido em relação a buffer overflow.
+Nesse caso, não foi detectado nenhum overflow da stack porque a entrada fornecida não foi o suficiente para exceder a zona de proteção.
+
+# Exercicio 3
+
+Resultado obtido das funções main, foo e bar:
+
+0804917d <main>:
+ 804917d:	55                   	push   %ebp
+ 804917e:	89 e5                	mov    %esp,%ebp
+ 8049180:	83 e4 f0             	and    $0xfffffff0,%esp
+ 8049183:	e8 07 00 00 00       	call   804918f <foo>
+ 8049188:	b8 00 00 00 00       	mov    $0x0,%eax
+ 804918d:	c9                   	leave
+ 804918e:	c3                   	ret
+
+0804918f <foo>:
+ 804918f:	55                   	push   %ebp
+ 8049190:	89 e5                	mov    %esp,%ebp
+ 8049192:	83 ec 18             	sub    $0x18,%esp
+ 8049195:	8b 45 08             	mov    0x8(%ebp),%eax
+ 8049198:	83 c0 01             	add    $0x1,%eax
+ 804919b:	83 ec 0c             	sub    $0xc,%esp
+ 804919e:	50                   	push   %eax
+ 804919f:	e8 0b 00 00 00       	call   80491af <bar>
+ 80491a4:	83 c4 10             	add    $0x10,%esp
+ 80491a7:	89 45 f4             	mov    %eax,-0xc(%ebp)
+ 80491aa:	8b 45 f4             	mov    -0xc(%ebp),%eax
+ 80491ad:	c9                   	leave
+ 80491ae:	c3                   	ret
+
+080491af <bar>:
+ 80491af:	55                   	push   %ebp
+ 80491b0:	89 e5                	mov    %esp,%ebp
+ 80491b2:	83 ec 10             	sub    $0x10,%esp
+ 80491b5:	8b 45 08             	mov    0x8(%ebp),%eax
+ 80491b8:	83 c0 01             	add    $0x1,%eax
+ 80491bb:	89 45 fc             	mov    %eax,-0x4(%ebp)
+ 80491be:	8b 45 fc             	mov    -0x4(%ebp),%eax
+ 80491c1:	c9                   	leave
+ 80491c2:	c3                   	ret
+
+
+a) 
+Dentro da função Foo, bar é chamado em 804919f
+```
+804919f:	e8 0b 00 00 00       	call   80491af <bar>
+```
+
+O valor em eax (que é incrementado em foo como 0x8(%ebp) + 1) é empurrado para a pilha. Isso segue a convenção de chamada x86, especificamente a convenção cdecl, onde os parâmetros são passados na pilha da direita para a esquerda. A função chamada (bar) então acessa este parâmetro da pilha.
+
+O conceito de ABI é aplicado aqui para definir como o parâmetro é passado entre foo e bar:
+
+foo empurra o valor no registrador eax para a pilha (push %eax), preparando-o para ser passado para bar.
+
+``` 
+804919e:  50                    push   %eax
+```
+
+bar recupera esse valor da pilha ao acessar 0x8(%ebp), que é onde o parâmetro foi colocado pela convenção de chamada.
+Este mecanismo de empurrar o valor para a pilha e depois recuperá-lo é uma aplicação direta das regras da ABI para passagem de parâmetros entre funções.
+
+``` 
+ 80491b5:	8b 45 08             	mov    0x8(%ebp),%eax
+```
+
+b)
+
+Em Bar, o resultado é colocado em eax antes de retornar:
+```
+ 80491be:  8b 45 fc              mov    -0x4(%ebp),%eax
+```
+
+O registrador eax é usado para retornar o valor de bar para foo. Isso é consistente com a convenção de chamada cdecl, onde o valor de retorno de uma função é colocado em eax.
+Isto é feito de forma similar ao item B, que armazena o valor do parametro de uma função antes de chama-la. Neste caso é armazenado o valor de retorno antes de ocorrer de fato o retorno.
+
+
+c)
+Duas primeiras instruções de Foo:
+```
+ 804918f:  55                    push   %ebp        # Salva o valor atual de ebp (base pointer) na pilha.
+ 8049190:  89 e5                 mov    %esp,%ebp   # Copia o valor de esp (stack pointer) para ebp.
+```
+
+```
+ 80491ad:  c9                    leave
+```
+Esta instrução restaura o antigo ponteiro base e o ponteiro de pilha, limpando o quadro de pilha antes de retornar.
+
+No item a) vimos que a ABI define uma convenção de parâmetros que são passados entre funções e como os valores de retorno são gerenciados, e isto esta sendo garantido pelo uso correto do quadro de pilha e o fluxo de dados entre funções.
+
+d)
+Em foo e bar, a terceira instrução é:
+
+Foo:
+```
+ 8049192:  83 ec 18              sub    $0x18,%esp
+```
+
+Bar:
+```
+ 80491b2:  83 ec 10              sub    $0x10,%esp
+```
+
+Essas instruções alocam espaço na pilha para variáveis locais. Isso faz parte da ABI x86, que dita o uso da pilha para armazenamento de variáveis locais.
+
+Em main, a terceira instrução é:
+
+```
+ 8049180:  83 e4 f0              and    $0xfffffff0,%esp
+```
+
+Isso alinha o ponteiro de pilha a um limite de 16 bytes, um requisito comum para otimização de desempenho e conformidade com a ABI.
+
+e)
+
+Ao alterar o tipo de retorno de bar para char, observamos que a instrução movsbl foi adicionada em bar antes de retornar:
+
+```
+80491c1:  0f be 45 fc           movsbl -0x4(%ebp),%eax
+```
+
+Isso é necessário porque bar agora retorna um byte (char), mas os valores de retorno em x86 são esperados em eax, que é de 32 bits. A instrução movsbl estende o byte (char) em -0x4(%ebp) para um valor de 32 bits em eax, preservando o sinal do byte original.
+
+A declaração de foo e bar antes de main é útil porque permite ao compilador conhecer os protótipos das funções antes de serem chamadas em main. Isso ajuda o compilador a verificar se os tipos de parâmetros e de retorno estão corretos, evitando erros de compilação e garantindo a conformidade com a ABI durante a geração do código assembly.
+
+
+# Exercício 4
+
+## A)
+
+Todos os binários retornam a string "Foo".
+
+## B)
+
+Executando o comando `ls -ltr`, temos:
+| nome-arquivo | tamanho (Bytes) |
+|--------------|-----------------|
+|   p4-v1      |     15016       |
+|   p4-v2      |     14976       |
+|   p4-v3      |     14920       |
+```
+-rwxr-xr-x 1 alvaro alvaro 14920 Jul  3 20:08 p4-v3
+-rwxr-xr-x 1 alvaro alvaro 15016 Jul  3 20:11 p4-v1
+-rwxr-xr-x 1 alvaro alvaro 14976 Jul  3 20:11 p4-v2
+```
+
+Pode-se notar que `p4-v3 < p4-v2 < p4-v1`.
+Analisando as diretivas de compilação podemos notar que:
+- p4-v1: O executável inclui código de todos os arquivos objeto diretamente, resultando em um tamanho de arquivo maior porque todo o código é compilado e linkado no executável.
+
+- p4-v2: O executável inclui código de p4.o e linka estaticamente a biblioteca libp4.a. Ao linkar estaticamente significa que o código da biblioteca libp4.a é incluído no executável, aumentando o tamanho do arquivo.
+
+- p4-v3: O executável inclui código de p4.o e linka dinamicamente a biblioteca libp4.so. A linkagem dinâmica significa que o código da biblioteca libp4.so não é incluído no próprio executável, levando a um tamanho de arquivo menor.
+
+## C)
+
+Ao rodar o comando para todos os executáveis, pode-se notar que:
+- `p4-v1`: Todos os símbolos são listados, pois são diretamente linkados no executável.
+- `p4-v2`: Apenas `foo` está listado em `p4-v2`. `bar` não é listado porque é linkado estaticamente a partir de libp4.a, e `foo` está presente porque é utilizado em `p4-v2`.
+- `p4-v3`: `foo` e `bar` não são linkados diretamente em `p4-v3`, mas são resolvidos dinamicamente a partir de libp4.so durante a execução.
+ 
+## D)
+
+Os binários `p4-v1` e `p4-v2` necessitam da biblioteca `libc.so.6`, enquanto `p4-v3` necessita tanto de `libc.so.6` quanto `libp4.so`.
+
+Quando `p4-v3` é carregado na memória, ld.so usa as informações do campo Shared library para adicioná-las.
+
+## E)
+### Bibliotecas Estáticas
+
+#### a) Instalação em Outros Hosts
+**Prós:**
+- **Autossuficiente:** Todo o código necessário está incluído no executável, simplificando a implantação.
+- **Sem problemas de dependência:** O executável não depende de bibliotecas externas estarem presentes no host.
+
+**Contras:**
+- **Tamanho maior:** O arquivo executável é maior porque contém todo o código das bibliotecas.
+- **Atualizações difíceis:** Atualizar a biblioteca requer recompilar e redistribuir todo o executável.
+
+#### b) Atualização da Biblioteca
+**Prós:**
+- **Comportamento previsível:** O executável permanece inalterado e não é afetado por atualizações da biblioteca.
+- **Dependências estáveis:** Garante compatibilidade, pois a versão da biblioteca usada é fixa.
+
+**Contras:**
+- **Recompilação necessária:** Qualquer alteração na biblioteca requer a recompilação do executável.
+- **Demorado:** Redistribuição e reinstalação de todo o programa são necessárias.
+
+#### c) Uso Compartilhado por Múltiplos Programas
+**Prós:**
+- **Independência:** Cada programa tem sua própria cópia da biblioteca, reduzindo o risco de interferência.
+- **Otimização personalizada:** Programas podem otimizar o uso da biblioteca com base em suas necessidades específicas.
+
+**Contras:**
+- **Uso de memória:** Múltiplas cópias da mesma biblioteca são carregadas na memória, aumentando o consumo de recursos.
+- **Desperdício de armazenamento:** Espaço em disco é desperdiçado devido a cópias duplicadas da mesma biblioteca.
+
+### Bibliotecas Dinâmicas
+
+#### a) Instalação em Outros Hosts
+**Prós:**
+- **Tamanho menor:** O executável é menor, pois não contém o código da biblioteca.
+- **Atualizações modulares:** Somente a biblioteca precisa ser atualizada, não o executável inteiro.
+
+**Contras:**
+- **Gerenciamento de dependências:** A versão correta da biblioteca dinâmica deve estar presente no host.
+- **Problemas de compatibilidade:** O ambiente do host deve suportar a biblioteca dinâmica.
+
+#### b) Atualização da Biblioteca
+**Prós:**
+- **Atualizações fáceis:** Atualizar a biblioteca não requer recompilar o executável.
+- **Segurança aprimorada:** Patches de segurança podem ser aplicados rapidamente atualizando a biblioteca.
+
+**Contras:**
+- **Potencial instabilidade:** Uma atualização da biblioteca pode introduzir bugs ou incompatibilidades.
+- **Problemas de dependência:** Executáveis podem falhar se a atualização da biblioteca for incompatível.
+
+#### c) Uso Compartilhado por Múltiplos Programas
+**Prós:**
+- **Uso eficiente de memória:** Uma única cópia da biblioteca é compartilhada por múltiplos programas, economizando recursos.
+- **Menor uso de armazenamento:** Reduz o espaço em disco necessário para as bibliotecas.
+
+**Contras:**
+- **Dependência de versão:** Todos os programas devem ser compatíveis com a versão da biblioteca instalada.
+- **Risco de interferência:** Um problema na biblioteca pode afetar todos os programas que a utilizam.
