@@ -167,3 +167,8 @@ make bypass
 
 > Nota: Quando o access token for solicitado, insira qualquer valor
 
+~~~> Bem, a ideia era uma intervenção não invasiva, sem gdb.
+     Existe um jeito mais simples.
+     Porém, como não estava explícito no enunciado, a solução apresentada é válida.
+
+~~~>> 10

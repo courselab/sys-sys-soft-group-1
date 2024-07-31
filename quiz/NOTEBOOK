@@ -17,6 +17,7 @@ Exemplos de saida:
 0x562d0255a149
 0x561afc82d149
 ```
+~~~>> 2.5
 
 # Exercício 2
 
@@ -49,6 +50,8 @@ make p2_solution
 
 Após compilar com a flag `-fstack-protector` o programa fica protegido em relação a buffer overflow.
 Nesse caso, não foi detectado nenhum overflow da stack porque a entrada fornecida não foi o suficiente para exceder a zona de proteção.
+
+~~~>> 2.5
 
 # Exercicio 3
 
@@ -123,7 +126,6 @@ Em Bar, o resultado é colocado em eax antes de retornar:
 O registrador eax é usado para retornar o valor de bar para foo. Isso é consistente com a convenção de chamada cdecl, onde o valor de retorno de uma função é colocado em eax.
 Isto é feito de forma similar ao item B, que armazena o valor do parametro de uma função antes de chama-la. Neste caso é armazenado o valor de retorno antes de ocorrer de fato o retorno.
 
-
 c)
 Duas primeiras instruções de Foo:
 ```
@@ -173,6 +175,7 @@ Isso é necessário porque bar agora retorna um byte (char), mas os valores de r
 
 A declaração de foo e bar antes de main é útil porque permite ao compilador conhecer os protótipos das funções antes de serem chamadas em main. Isso ajuda o compilador a verificar se os tipos de parâmetros e de retorno estão corretos, evitando erros de compilação e garantindo a conformidade com a ABI durante a geração do código assembly.
 
+~~~>> 2.5
 
 # Exercício 4
 
@@ -199,6 +202,8 @@ Analisando as diretivas de compilação podemos notar que:
 - p4-v1: O executável inclui código de todos os arquivos objeto diretamente, resultando em um tamanho de arquivo maior porque todo o código é compilado e linkado no executável.
 
 - p4-v2: O executável inclui código de p4.o e linka estaticamente a biblioteca libp4.a. Ao linkar estaticamente significa que o código da biblioteca libp4.a é incluído no executável, aumentando o tamanho do arquivo.
+
+~~~> Mas ainda é menor que o anterior. Por quê?
 
 - p4-v3: O executável inclui código de p4.o e linka dinamicamente a biblioteca libp4.so. A linkagem dinâmica significa que o código da biblioteca libp4.so não é incluído no próprio executável, levando a um tamanho de arquivo menor.
 
@@ -273,3 +278,5 @@ Quando `p4-v3` é carregado na memória, ld.so usa as informações do campo Sha
 **Contras:**
 - **Dependência de versão:** Todos os programas devem ser compatíveis com a versão da biblioteca instalada.
 - **Risco de interferência:** Um problema na biblioteca pode afetar todos os programas que a utilizam.
+
+~~~>> 2.5
